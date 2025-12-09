@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Line Reporting</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Line Reporting</h1>
+
+  <div class="container">
+    <div class="reporting-container">
+
+      <!-- Date Selection -->
+      <div class="form-row center-row">
+  <label for="reportDate">Date:</label>
+  <input type="date" id="reportDate">
+
+  <label for="reportLineSelect">Select Line:</label>
+  <select id="reportLineSelect">
+    <option value="">--Choose Line--</option>
+    <option value="1">Line No.1</option>
+    <option value="2">Line No.2</option>
+    <option value="3">Line No.3</option>
+    <option value="4">Line No.4</option>
+    <option value="5">Line No.5</option>
+  </select>
+
+  <button class="btn" id="loadReportBtn">Load Report</button>
+</div>
+
+
+      <!-- Report Table Container -->
+      <div id="reportTableContainer" style="display:none;">
+        
+        <!-- Time Dropdown -->
+        <div class="form-row">
+          <label for="globalTime">Time:</label>
+          <select id="globalTime">
+            <option value="">--Select Time--</option>
+            <option value="9:00 AM - 10:00 AM">9:00 AM - 10:00 AM</option>
+            <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
+            <option value="11:00 AM - 12:00 PM">11:00 AM - 12:00 PM</option>
+            <option value="12:00 PM - 13:00 PM">12:00 PM - 13:00 PM</option>
+            <option value="13:00 PM - 13:30 PM">13:00 PM - 13:30 PM</option>
+            <option value="14:00 PM - 15:00 PM">14:00 PM - 15:00 PM</option>
+            <option value="15:00 PM - 16:00 PM">15:00 PM - 16:00 PM</option>
+            <option value="16:15 PM - 17:00 PM">16:15 PM - 17:00 PM</option>
+            <option value="17:00 PM - 18:00 PM">17:00 PM - 18:00 PM</option>
+            <option value="18:00 PM - 19:00 PM">18:00 PM - 19:00 PM</option>
+            <option value="19:00 PM - 20:00 PM">19:00 PM - 20:00 PM</option>
+            <option value="20:00 PM - 21:00 PM">20:00 PM - 21:00 PM</option>
+            <option value="21:00 PM - 22:00 PM">21:00 PM - 22:00 PM</option>
+          </select>
+        </div>
+
+        <!-- Reporting Table -->
+        <table id="reportTable">
+          <thead>
+            <tr>
+              <th>Employee Name</th>
+              <th>Activity</th>
+              <th>RTF No.</th>
+              <th>Style No.</th>
+              <th>Color</th>
+              <th>Component</th>
+              <th>Balance</th>
+              <th>Target</th>
+              <th>Pass Pcs.</th>
+              <th>Alter Pcs.</th>
+              <th>Alter %</th>
+              <th>Achieved qty.</th>
+            </tr>
+          </thead>
+          <tbody id="reportTableBody"></tbody>
+
+        </table>
+
+        <!-- Action Buttons -->
+        <div style="text-align: center; margin-top: 20px;">
+          <button class="btn" id="submitReportBtn">Submit Report</button>
+        </div>
+        <div style="text-align: center; margin-top: 10px;">
+          <button class="btn" id="refreshBtn">🔄 Refresh</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="form.js"></script>
+</body>
+</html>
