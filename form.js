@@ -48,12 +48,23 @@ function getVal(row, key) {
   return "";
 }
 
-function findRtfMatches(lastDigits) {
-  if (!lastDigits || !rtfSheetData || rtfSheetData.length === 0) return [];
-  const padded = lastDigits.toString().padStart(3, "0");
-  const fullRtf = `RTF/000${padded}`;
+function findRtfMatches(inputVal) {
+  if (!inputVal || !rtfSheetData || rtfSheetData.length === 0) return [];
+
+  const digits = inputVal.toString().replace(/\D/g, ""); // only numbers
+
+  let fullRtf = "";
+  if (digits.length === 3) {
+    fullRtf = `RTF/${digits.padStart(6, "0")}`; // e.g. 981 → RTF/000981
+  } else if (digits.length === 6) {
+    fullRtf = `RTF/${digits}`; // e.g. 001032 → RTF/001032
+  } else {
+    return [];
+  }
+
   return rtfSheetData.filter(r => getVal(r, "RTF NO.") === fullRtf);
 }
+
 
 
 
@@ -315,6 +326,9 @@ if (addEmployeeBtn) {
     renderTable(date, line);
     setLineMsg.innerText = `✅ Added ${selected.length} employee(s) to Line No.${line} for ${date}`;
     document.getElementById("lineActionGroup").style.display = "block";
+    document.getElementById("setLineDiv").style.display = "block";
+    document.getElementById("lineTableContainer").style.display = "block";
+
 
   });
 }
@@ -500,21 +514,35 @@ document.addEventListener("click", (e) => {
 document.addEventListener("input", (e) => {
   if (!e.target.classList.contains("rtf-input")) return;
 
-  const lastDigits = e.target.value.trim();
-  const matches = findRtfMatches(lastDigits);
+  const val = e.target.value.trim();
+  const digits = val.replace(/\D/g, ""); // only numbers
+
+  let fullRtf = "";
+  if (digits.length === 3) {
+    fullRtf = `RTF/${digits.padStart(6, "0")}`; // e.g. 981 → RTF/000981
+  } else if (digits.length === 6) {
+    fullRtf = `RTF/${digits}`; // e.g. 001032 → RTF/001032
+  } else {
+    return; // ignore if not 3 or 6 digits
+  }
+
+  const matches = findRtfMatches(fullRtf);
   if (matches.length === 0) return;
 
   const row = e.target.closest("tr");
   if (!row) return;
 
   // ✅ Update input field to full RTF
-  const fullRtf = `RTF/000${lastDigits.padStart(3, "0")}`;
   e.target.value = fullRtf;
 
   // ✅ Extract values
   const style = getVal(matches[0], "STYLE NO.");
-  const colors = [...new Set(matches.map(m => getVal(m, "COLOR")).flatMap(c => c.split(",").map(x => x.trim())))].filter(Boolean);
-  const comps = [...new Set(matches.map(m => getVal(m, "COMPONENT")).flatMap(c => c.split(",").map(x => x.trim())))].filter(Boolean);
+  const colors = [...new Set(matches.map(m => getVal(m, "COLOR"))
+    .flatMap(c => c.split(",").map(x => x.trim())))]
+    .filter(Boolean);
+  const comps = [...new Set(matches.map(m => getVal(m, "COMPONENT"))
+    .flatMap(c => c.split(",").map(x => x.trim())))]
+    .filter(Boolean);
 
   // ✅ Always fill current row
   fillRow(row, style, colors, comps);
@@ -531,6 +559,7 @@ document.addEventListener("input", (e) => {
     });
   }
 });
+
 document.addEventListener("input", (e) => {
   const row = e.target.closest("tr");
   if (!row) return;
@@ -550,11 +579,10 @@ document.addEventListener("input", (e) => {
   }
 
   if (alterPercentInput) {
-  const achievedVal = parseInt(achievedInput?.value.trim()) || 0;
-  const percent = achievedVal > 0 ? ((alterVal / achievedVal) * 100).toFixed(1) : "";
-  alterPercentInput.value = percent;
-}
-
+    const achievedVal = parseInt(achievedInput?.value.trim()) || 0;
+    const percent = achievedVal > 0 ? ((alterVal / achievedVal) * 100).toFixed(1) : "";
+    alterPercentInput.value = percent;
+  }
 });
 
 // ✅ Helper to fill style, color, component in a row
@@ -590,7 +618,6 @@ function fillRow(row, style, colors, comps) {
     compCell.appendChild(select);
   }
 }
-
 
 // ------------------------------------------------------------
 // On load

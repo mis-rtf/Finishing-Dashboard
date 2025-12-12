@@ -6,29 +6,35 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Back Button (top-left corner fixed) -->
+<div style="position: fixed; top: 10px; left: 10px; z-index: 1000;">
+  <button id="backBtnReport" class="btn btn-small" title="Go back">⬅️ Back</button>
+</div>
+
   <h1>Line Reporting</h1>
 
   <div class="container">
     <div class="reporting-container">
 
       <!-- Date Selection -->
-      <div class="form-row center-row">
-  <label for="reportDate">Date:</label>
-  <input type="date" id="reportDate">
+      <div class="form-row">  
+        <label for="reportDate">Date:</label>
+        <input type="date" id="reportDate">
+      </div>
 
-  <label for="reportLineSelect">Select Line:</label>
-  <select id="reportLineSelect">
-    <option value="">--Choose Line--</option>
-    <option value="1">Line No.1</option>
-    <option value="2">Line No.2</option>
-    <option value="3">Line No.3</option>
-    <option value="4">Line No.4</option>
-    <option value="5">Line No.5</option>
-  </select>
-
-  <button class="btn" id="loadReportBtn">Load Report</button>
-</div>
-
+      <!-- Line Selection -->
+      <div class="form-row">
+        <label for="reportLineSelect">Select Line:</label>
+        <select id="reportLineSelect">
+          <option value="">--Choose Line--</option>
+          <option value="1">Line No.1</option>
+          <option value="2">Line No.2</option>
+          <option value="3">Line No.3</option>
+          <option value="4">Line No.4</option>
+          <option value="5">Line No.5</option>
+        </select>
+        <button class="btn" id="loadReportBtn">Load Report</button>
+      </div>
 
       <!-- Report Table Container -->
       <div id="reportTableContainer" style="display:none;">
@@ -86,6 +92,16 @@
       </div>
     </div>
   </div>
+
+  <script>
+  const backBtnReport = document.getElementById("backBtnReport");
+  if (backBtnReport) {
+    backBtnReport.addEventListener("click", () => {
+      window.location.href = "line-setup.html"; // 👈 apne Line Set-Up page ka filename daalo
+    });
+  }
+</script>
+
 
   <script src="form.js"></script>
 </body>
