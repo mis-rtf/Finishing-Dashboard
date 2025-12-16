@@ -190,9 +190,19 @@
   <!-- ✅ Scrollable Content -->
   <div class="content-area">
 
-    <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
-      <button id="addEmployeeBtn" class="btn btn-small">Add Employee</button>
-    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+  <!-- ✅ Show Line dropdown on left -->
+  <div id="showLineContainer" style="display: none;">
+    <label for="showLineSelect" style="font-weight: 500;">Show Line</label><br>
+    <select id="showLineSelect" class="btn btn-small">
+      <option value="">--Choose Line--</option>
+    </select>
+  </div>
+
+  <!-- ✅ Add Employee button on right -->
+  <button id="addEmployeeBtn" class="btn btn-small">Add Employee</button>
+</div>
+
 
     <div class="select-buttons">
       <button id="activityToggle">+ Select Activity</button>
@@ -207,12 +217,7 @@
     <div id="lineActionGroup" style="display: none;">
       <div class="form-row" style="display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 10px;">
         <button id="editLineBtn" class="btn btn-small">Edit Line</button>
-        <div id="showLineContainer" style="display: none;">
-          <label for="showLineSelect" style="font-weight: 500;">Show Line</label><br>
-          <select id="showLineSelect" class="btn btn-small">
-            <option value="">--Choose Line--</option>
-          </select>
-        </div>
+      
         <button id="manualAddBtn" class="btn btn-small">+ Add</button>
       </div>
       

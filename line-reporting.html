@@ -17,24 +17,28 @@
     <div class="reporting-container">
 
       <!-- Date Selection -->
-      <div class="form-row">  
-        <label for="reportDate">Date:</label>
-        <input type="date" id="reportDate">
-      </div>
-
-      <!-- Line Selection -->
-      <div class="form-row">
-        <label for="reportLineSelect">Select Line:</label>
-        <select id="reportLineSelect">
-          <option value="">--Choose Line--</option>
-          <option value="1">Line No.1</option>
-          <option value="2">Line No.2</option>
-          <option value="3">Line No.3</option>
-          <option value="4">Line No.4</option>
-          <option value="5">Line No.5</option>
-        </select>
-        <button class="btn" id="loadReportBtn">Load Report</button>
-      </div>
+      <!-- ✅ Centered Date + Line + Right-aligned Load Report -->
+<!-- ✅ Centered Date + Line + Load Report -->
+<div class="form-row" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 40px; margin-bottom: 20px;">
+  <div>
+    <label for="reportDate">Date:</label><br>
+    <input type="date" id="reportDate">
+  </div>
+  <div>
+    <label for="reportLineSelect">Select Line:</label><br>
+    <select id="reportLineSelect">
+      <option value="">--Choose Line--</option>
+      <option value="1">Line No.1</option>
+      <option value="2">Line No.2</option>
+      <option value="3">Line No.3</option>
+      <option value="4">Line No.4</option>
+      <option value="5">Line No.5</option>
+    </select>
+  </div>
+  <div>
+    <button class="btn" id="loadReportBtn">Load Report</button>
+  </div>
+</div>
 
       <!-- Report Table Container -->
       <div id="reportTableContainer" style="display:none;">
@@ -63,9 +67,10 @@
         <!-- Reporting Table -->
         <table id="reportTable">
           <thead>
-            <tr>
+         <tr>
               <th>Employee Name</th>
               <th>Activity</th>
+              <th>Current Activity</th> <!-- ✅ New Column -->
               <th>RTF No.</th>
               <th>Style No.</th>
               <th>Color</th>
@@ -76,8 +81,10 @@
               <th>Alter Pcs.</th>
               <th>Alter %</th>
               <th>Achieved qty.</th>
-            </tr>
-          </thead>
+              <th></th>
+        </tr>
+      </thead>
+
           <tbody id="reportTableBody"></tbody>
 
         </table>

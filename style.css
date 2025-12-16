@@ -81,14 +81,10 @@ label {
 }
 
 select, input[type="date"] {
-  padding: 8px;
-  font-size: 14px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  min-width: 180px;
-  background: #fff;
-  max-width: 100%;
+  padding: 2px 4px;
+  font-size: 12px;
 }
+
 
 .center-row {
   display: flex;
@@ -374,44 +370,11 @@ tbody tr:hover {
 }
 
 
-/* ✅ Compact input fields inside table */
-/* Shared styling for all input fields except RTF */
-table input.balance-input,
-table input.target-input,
-table input.pass-input,
-table input.alter-input,
-table input.alter-percent-input,
-table input.achieved-input {
-  width: 40px;
-  padding: 6px 8px;
-  font-size: 13px;
-  text-align: center;
-  border-radius: 4px;
-  border: 1px solid var(--border);
-}
 
-/* ✅ Separate styling for RTF input */
-table input.rtf-input {
-  width: 69px;         /* 👈 wider for long RTF codes */
-  padding: 8px 10px;
-  font-size: 12px;
-  text-align: left;
-  border-radius: 4px;
-  border: 1px solid var(--border);
-  background-color: #f9f9f9; /* optional subtle background */
-}
 
-/* ✅ Compact dropdowns for Color & Component */
-table select.color-select,
-table select.component-select {
-  width: 50px;        /* 👈 adjust as needed (80–120px) */
-  padding: 6px 8px;
-  font-size: 11px;
-  text-align: center;
-  border-radius: 4px;
-  border: 1px solid var(--border);
-  background-color: #fff;
-}
+
+
+
 .line-form-row {
   display: flex;
   justify-content: center;      /* 👈 center align horizontally */
@@ -476,3 +439,255 @@ table select.component-select {
   min-width: 220px;
 }
 
+@media screen and (max-width: 768px) {
+  .line-form-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .form-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .select-buttons {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .panel-wrapper {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .activity-box,
+  .employee-box {
+    width: 90%;
+    max-width: 400px;
+  }
+
+  #showLineContainer,
+  #addEmployeeBtn {
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+  }
+
+  #showLineSelect {
+    width: 100%;
+  }
+
+  .btn,
+  .btn-small {
+    width: 100%;
+    text-align: center;
+  }
+
+  .corner-buttons,
+  .corner-refresh {
+    position: static;
+    margin: 10px auto;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+}
+@media screen and (max-width: 768px) {
+  .form-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    margin-bottom: 15px;
+  }
+
+  label {
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+
+  input[type="date"],
+  select {
+    width: 100%;
+    max-width: 400px;
+    padding: 8px 12px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+
+  #loadReportBtn,
+  #submitReportBtn,
+  #refreshBtn {
+    width: 100%;
+    max-width: 400px;
+    margin: 10px auto;
+    display: block;
+  }
+
+  table {
+    font-size: 13px;
+    width: 100%;
+    display: block;
+    overflow-x: auto;
+  }
+
+  th, td {
+    padding: 8px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  #reportTableContainer {
+    margin-top: 15px;
+  }
+
+  .btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+.add-btn {
+  font-size: 10px;
+  padding: 2px;
+  border-radius: 2px;
+  background-color: #e0e0e0;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}
+.add-btn:hover {
+  background-color: #d0d0d0;
+}
+/* ✅ Make table fit container */
+#reportTableContainer {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* ✅ Table layout fix */
+#reportTable {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+/* === COLUMN WIDTHS === */
+#reportTable th:nth-child(1),  #reportTable td:nth-child(1)  { width: 100px; text-align: center; }
+#reportTable th:nth-child(2),  #reportTable td:nth-child(2)  { width: 100px; text-align: center; }
+#reportTable th:nth-child(3),
+#reportTable td:nth-child(3) {
+  width: 90px;
+  min-width: 90px;
+  max-width: 90px;
+  padding: 4px;
+  text-align: center;
+}
+
+#reportTable th:nth-child(4),  #reportTable td:nth-child(4)  { width: 70px;  text-align: center; }
+#reportTable th:nth-child(5),  #reportTable td:nth-child(5)  { width: 70px;  text-align: center; }
+#reportTable th:nth-child(6),  #reportTable td:nth-child(6)  { width: 80px;  text-align: center; }
+#reportTable th:nth-child(7),  #reportTable td:nth-child(7)  { width: 80px;  text-align: center; }
+#reportTable th:nth-child(8),  #reportTable td:nth-child(8)  { width: 60px;  text-align: center; }
+#reportTable th:nth-child(9),  #reportTable td:nth-child(9)  { width: 60px;  text-align: center; }
+#reportTable th:nth-child(10), #reportTable td:nth-child(10) { width: 60px;  text-align: center; }
+#reportTable th:nth-child(11), #reportTable td:nth-child(11) { width: 60px;  text-align: center; }
+#reportTable th:nth-child(12), #reportTable td:nth-child(12) { width: 60px;  text-align: center; }
+#reportTable th:nth-child(13), #reportTable td:nth-child(13) { width: 60px;  text-align: center; }
+#reportTable th:nth-child(14), #reportTable td:nth-child(14) { width: 30px;  text-align: center; }
+
+#reportTable td:nth-child(8) input.balance-input,
+#reportTable td:nth-child(9) input.target-input,
+#reportTable td:nth-child(10) input.pass-input,
+#reportTable td:nth-child(11) input.alter-input,
+#reportTable td:nth-child(12) input.alter-percent-input,
+#reportTable td:nth-child(13) input.achieved-input {
+  width: 100%;
+  padding: 1px 2px;           /* ✅ tighter padding */
+  font-size: 10px;            /* ✅ compact font */
+  line-height: 1.2;
+  box-sizing: border-box;
+  height: auto;
+  margin: 0;
+  text-align: center;
+}
+#reportTable td:nth-child(4) input.rtf-input {
+  width: 100%;
+  padding: 1px 2px;           /* ✅ tighter padding */
+  font-size: 10px;            /* ✅ compact font */
+  line-height: 1.2;
+  box-sizing: border-box;
+  height: auto;
+  margin: 0;
+  text-align: center;
+}
+/* ✅ Lock Current Activity dropdown inside column */
+#reportTable td:nth-child(3) {
+  width: 90px;
+  min-width: 90px;
+  max-width: 90px;
+  padding: 4px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+#reportTable td:nth-child(3) select.current-activity-select {
+  display: block;
+  width: calc(100% - 4px);     /* ✅ subtract padding */
+  padding: 1px 2px;
+  font-size: 10px;
+  line-height: 1.2;
+  height: auto;
+  box-sizing: border-box;
+  margin: 0 auto;
+  background-color: #f9f9f9;
+  border: 1px solid var(--border);
+}
+
+
+
+
+
+/* === COMPACT INPUTS & DROPDOWNS === */
+#reportTable input{
+  font-size: 11px;
+  padding: 2px 4px;
+  box-sizing: border-box;
+  height: auto;
+  line-height: 1.2;
+}
+
+/* Specific dropdowns */
+#reportTable td:nth-child(3) select.current-activity-select,
+#reportTable td:nth-child(6) select.color-select,
+#reportTable td:nth-child(7) select.component-select {
+  width: 100%;
+  margin: 0 auto;
+  display: block;
+}
+
+/* === MOBILE FIX === */
+@media screen and (max-width: 768px) {
+  #reportTable th,
+  #reportTable td {
+    white-space: normal;
+  }
+}
+#reportTable td:nth-child(3) {
+  width: 90px !important;
+  padding: 4px !important;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+#reportTable td:nth-child(3) select.current-activity-select {
+  display: block;
+  width: 100% !important;
+  padding: 1px 2px !important;
+  font-size: 10px !important;
+  line-height: 1.2 !important;
+  height: auto !important;
+  box-sizing: border-box;
+  margin: 0 auto !important;
+}

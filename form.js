@@ -4,7 +4,7 @@ const fetchUrl = "https://script.google.com/macros/s/AKfycbzUecmsk_6IsegFyyYrRg6
 // ✅ OUTPUT tab (save line setup)
 const saveLineUrl = "https://script.google.com/macros/s/AKfycby0fR6yKQIMiVj8Ry-hPZi8O9yQy7vz0to7DoxX1NWEqPMoqu7c0TSsWSLHK68RVqipOQ/exec";
 // ✅ FINAL OUTPUT tab (save report data)
-const finalOutputUrl = "https://script.google.com/macros/s/AKfycbwis0WVbQ4bGDDxq0rO6Xzp6WnXKIuEN4kHSfzdyh-zAsjAgqV5k80tR-KYwP_T0pibpQ/exec";
+const finalOutputUrl = "https://script.google.com/macros/s/AKfycbyJsBOwWKAopBVxISSZd8zy4F8kNZYrmuAVtPdh3LL3RWMDxSDJvdwS_2ZQOfqj5og3Kw/exec";
 
 
 // ✅ DOM refs
@@ -627,16 +627,51 @@ window.addEventListener("DOMContentLoaded", () => {
   if (lineSetupDate) {
     lineSetupDate.value = new Date().toISOString().split("T")[0];
   }
-  const savedLineData = localStorage.getItem("lineEmployeesByDate");
-if (savedLineData) {
-  try {
-    Object.assign(lineEmployeesByDate, JSON.parse(savedLineData));
-  } catch (e) {
-    console.warn("⚠️ Failed to restore saved line data:", e);
-  }
-}
 
+  const savedLineData = localStorage.getItem("lineEmployeesByDate");
+  if (savedLineData) {
+    try {
+      const parsed = JSON.parse(savedLineData);
+      Object.assign(lineEmployeesByDate, parsed);
+
+      const showLineSelect = document.getElementById("showLineSelect");
+      const showLineContainer = document.getElementById("showLineContainer");
+
+      if (showLineSelect && showLineContainer) {
+        const today = new Date();
+        const todayStr = today.toISOString().split("T")[0];
+
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split("T")[0];
+
+        const allowedDates = [todayStr, yesterdayStr];
+
+        allowedDates.forEach(date => {
+          if (parsed[date]) {
+            Object.keys(parsed[date]).forEach(line => {
+              const value = `${date}__${line}`;
+              const label = `Line No.${line} (${date})`;
+              if (![...showLineSelect.options].some(opt => opt.value === value)) {
+                const opt = document.createElement("option");
+                opt.value = value;
+                opt.text = label;
+                showLineSelect.appendChild(opt);
+              }
+            });
+          }
+        });
+
+        showLineContainer.style.display = "block";
+      }
+    } catch (e) {
+      console.warn("⚠️ Failed to restore saved line data:", e);
+    }
+  }
 });
+
+
+
 // ------------------------------------------------------------
 // Line Reporting auto-fill (Date + Line)
 // ------------------------------------------------------------
@@ -685,6 +720,41 @@ function normalizeLine(val) {
   return digits.padStart(2,"0"); // "3" → "03"
 }
 
+
+document.addEventListener("click", (e) => {
+  if (e.target.classList.contains("add-btn")) {
+    const row = e.target.closest("tr");
+    if (!row) return;
+
+    // ✅ Clone row
+    const clone = row.cloneNode(true);
+
+    // ✅ Reset inputs in cloned row
+    clone.querySelectorAll("input").forEach(input => {
+      if (!input.classList.contains("rtf-input")) input.value = "";
+    });
+    clone.querySelectorAll("select").forEach(select => {
+      select.selectedIndex = 0;
+    });
+
+    // ✅ Replace "+" button with "❌" button in duplicate row
+    const btnCell = clone.querySelector(".add-btn");
+    if (btnCell) {
+      btnCell.outerHTML = `<button class="cut-btn" title="Remove row">x</button>`;
+    }
+
+    // ✅ Append cloned row
+    document.getElementById("reportTableBody").appendChild(clone);
+  }
+
+  // ✅ Handle cut button click (remove only that row)
+  if (e.target.classList.contains("cut-btn")) {
+    const row = e.target.closest("tr");
+    if (row) row.remove();
+  }
+});
+
+
 // ------------------------------------------------------------
 // Line Reporting logic
 // ------------------------------------------------------------
@@ -720,6 +790,13 @@ if (loadReportBtn) {
       date = `${yyyy}-${mm}-${dd}`;
     }
 
+    const container = document.getElementById("reportTableContainer");
+    const tbody = document.getElementById("reportTableBody");
+
+    // ✅ Show loading message
+    container.style.display = "block";
+    tbody.innerHTML = `<tr><td colspan="14" style="text-align:center; font-weight:600; color:#0077cc;">⏳ Loading report data...</td></tr>`;
+
     const data = await loadReportData();
     console.log("Selected date:", date);
     console.log("Selected line:", `Line No.${line}`);
@@ -730,45 +807,52 @@ if (loadReportBtn) {
       const rawLine = (r["LINE NO"] || r["LINE NO."] || r["Line No"] || "").trim();
       return sheetDate === date && rawLine === `Line No.${line}`;
     });
-const container = document.getElementById("reportTableContainer");
-const tbody = document.getElementById("reportTableBody");
-tbody.innerHTML = "";
 
-// ✅ Always fetch from OUTPUT tab (lineEmployeesByDate)
-const employees = lineEmployeesByDate[date]?.[line] || [];
+    // ✅ Always fetch from OUTPUT tab (lineEmployeesByDate)
+    const employees = lineEmployeesByDate[date]?.[line] || [];
 
-if (employees.length === 0) {
-  container.style.display = "block";
-  tbody.innerHTML = `<tr><td colspan="12">⚠️ No employees found for ${date} Line No.${line}</td></tr>`;
-  return;
-}
+    tbody.innerHTML = ""; // clear loading message
 
-// ✅ Render only Employee Name + Activity, keep headers intact
-employees.forEach(emp => {
-  const row = document.createElement("tr");
-  row.innerHTML = `
-    <td class="name-cell">${emp.name}</td>
-    <td class="activity-cell">${emp.activity}</td>
-    <td><input class="rtf-input" placeholder="Enter last 3 digits" /></td>
-    <td class="style-cell"></td>
-    <td class="color-cell"></td>
-    <td class="component-cell"></td>
-    <td><input class="balance-input" /></td>
-<td><input class="target-input" /></td>
-<td><input class="pass-input" /></td>
-<td><input class="alter-input" /></td>
-<td><input class="alter-percent-input" readonly /></td>
-<td><input class="achieved-input" readonly /></td>
+    if (employees.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="14" style="text-align:center;">⚠️ No employees found for ${date} Line No.${line}</td></tr>`;
+      return;
+    }
 
-  `;
-  tbody.appendChild(row);
-});
+    // ✅ Render only Employee Name + Activity, keep headers intact
+    employees.forEach(emp => {
+      const row = document.createElement("tr");
+      const activityOptions = [
+        "Thread Cutting", "Initial", "Final", "Re-Final",
+        "Alter Check", "Handwork"
+      ];
 
+      row.innerHTML = `
+        <td class="name-cell">${emp.name}</td>
+        <td class="activity-cell">${emp.activity}</td>
+        <td>
+          <select class="current-activity-select">
+            <option value="">--Choose Activity--</option>
+            ${activityOptions.map(act => `<option value="${act}">${act}</option>`).join("")}
+          </select>
+        </td>
+        <td><input class="rtf-input" placeholder="Enter last 3 digits" /></td>
+        <td class="style-cell"></td>
+        <td class="color-cell"></td>
+        <td class="component-cell"></td>
+        <td><input class="balance-input" /></td>
+        <td><input class="target-input" /></td>
+        <td><input class="pass-input" /></td>
+        <td><input class="alter-input" /></td>
+        <td><input class="alter-percent-input" readonly /></td>
+        <td><input class="achieved-input" readonly /></td>
+        <td><button class="add-btn" title="Duplicate row">+</button></td>
+      `;
+      tbody.appendChild(row);
+    });
 
-container.style.display = "block";
-setLineMsg.innerText = `📋 Showing Line No.${line} (${date}) from OUTPUT tab`;
+    setLineMsg.innerText = `📋 Showing Line No.${line} (${date}) from OUTPUT tab`;
 
-
+    // ✅ Optional: render filtered rows below if needed
     filtered.forEach(r => {
       const row = document.createElement("tr");
       row.innerHTML = `
@@ -787,10 +871,9 @@ setLineMsg.innerText = `📋 Showing Line No.${line} (${date}) from OUTPUT tab`;
       `;
       tbody.appendChild(row);
     });
-
-    container.style.display = "block";
   });
 }
+
 const submitReportBtn = document.getElementById("submitReportBtn");
 if (submitReportBtn) {
   submitReportBtn.addEventListener("click", async () => {
@@ -804,18 +887,19 @@ if (submitReportBtn) {
       payload.push({
         "Date": date,
         "Time": time,
-        "Employee Name": row.querySelector(".name-cell")?.innerText || "",
-        "Activity": row.querySelector(".activity-cell")?.innerText || "",
-        "RTF No.": row.querySelector(".rtf-input")?.value || "",
-        "Style No.": row.querySelector(".style-cell")?.innerText || "",
-        "Color": row.querySelector(".color-cell select")?.value || "",
-        "Component": row.querySelector(".component-cell select")?.value || "",
-        "Balance": row.querySelector(".balance-input")?.value || "",
-        "Target": row.querySelector(".target-input")?.value || "",
-        "Pass Pcs.": row.querySelector(".pass-input")?.value || "",
-        "Alter Pcs.": row.querySelector(".alter-input")?.value || "",
-        "Alter %": row.querySelector(".alter-percent-input")?.value || "",
-        "Achieved qty.": row.querySelector(".achieved-input")?.value || ""
+        "Employee Name": row.querySelector(".name-cell")?.innerText.trim() || "",
+        "Activity": row.querySelector(".activity-cell")?.innerText.trim() || "",
+        "Current Activity": row.querySelector(".current-activity-select")?.value.trim() || "",
+        "RTF No.": row.querySelector(".rtf-input")?.value.trim() || "",
+        "Style No.": row.querySelector(".style-cell")?.innerText.trim() || "",
+        "Color": row.querySelector(".color-cell select")?.value.trim() || "",
+        "Component": row.querySelector(".component-cell select")?.value.trim() || "",
+        "Balance": row.querySelector(".balance-input")?.value.trim() || "",
+        "Target": row.querySelector(".target-input")?.value.trim() || "",
+        "Pass Pcs.": row.querySelector(".pass-input")?.value.trim() || "",
+        "Alter Pcs.": row.querySelector(".alter-input")?.value.trim() || "",
+        "Alter %": row.querySelector(".alter-percent-input")?.value.trim() || "",
+        "Achieved qty.": row.querySelector(".achieved-input")?.value.trim() || ""
       });
     });
 
@@ -826,13 +910,51 @@ if (submitReportBtn) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-      alert("✅ Report submitted successfully!");
+
+      console.log("✅ Report data saved to sheet");
+
+      // ✅ Show success message in UI
+      const msgDiv = document.createElement("div");
+      msgDiv.id = "submitMsg";
+      msgDiv.innerText = "✅ Data submitted successfully!";
+      msgDiv.style.color = "green";
+      msgDiv.style.fontWeight = "600";
+      msgDiv.style.marginTop = "10px";
+      msgDiv.style.textAlign = "center";
+
+      // Remove old message if exists
+      const oldMsg = document.getElementById("submitMsg");
+      if (oldMsg) oldMsg.remove();
+
+      // Append below the button
+      submitReportBtn.parentNode.appendChild(msgDiv);
+
+      // ✅ Auto-hide after 3 seconds (optional)
+      setTimeout(() => {
+        msgDiv.remove();
+      }, 3000);
+
     } catch (err) {
-      console.error("❌ Failed to submit report:", err);
-      alert("⚠️ Failed to submit report. Please try again.");
+      console.error("❌ Failed to save report data:", err);
+
+      // ✅ Show error message in UI
+      const msgDiv = document.createElement("div");
+      msgDiv.id = "submitMsg";
+      msgDiv.innerText = "❌ Failed to submit data!";
+      msgDiv.style.color = "red";
+      msgDiv.style.fontWeight = "600";
+      msgDiv.style.marginTop = "10px";
+      msgDiv.style.textAlign = "center";
+
+      const oldMsg = document.getElementById("submitMsg");
+      if (oldMsg) oldMsg.remove();
+
+      submitReportBtn.parentNode.appendChild(msgDiv);
     }
   });
 }
+
+
 // ✅ Line Reporting Refresh → Go to index.html
 const refreshBtnReport = document.getElementById("refreshBtn");
 if (refreshBtnReport && document.getElementById("reportTableContainer")) {
