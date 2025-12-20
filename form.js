@@ -702,7 +702,7 @@ function normalizeDate(val) {
   const s = val.toString().trim();
 
   // If format is yyyy-mm-dd
-  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) { 
     const [yyyy, mm, dd] = s.split("-");
     return `${dd}-${mm}-${yyyy}`;
   }
@@ -827,7 +827,8 @@ if (loadReportBtn) {
       ];
 
       row.innerHTML = `
-        <td class="name-cell">${emp.name}</td>
+        <td class="name-cell">${emp.name} (${emp.code || ""})</td>
+
         <td class="activity-cell">${emp.activity}</td>
         <td>
           <select class="current-activity-select">
@@ -881,9 +882,22 @@ if (submitReportBtn) {
     const time = document.getElementById("globalTime")?.value || "";
     const rows = document.querySelectorAll("#reportTableBody tr");
 
-    const payload = [];
+    // ✅ Mandatory checks
+    if (!time) {
+      alert("⚠️ Please select a Time before submitting the report.");
+      return;
+    }
 
-    rows.forEach(row => {
+    const payload = [];
+    for (const row of rows) {
+      const passVal = row.querySelector(".pass-input")?.value.trim() || "";
+      const alterVal = row.querySelector(".alter-input")?.value.trim() || "";
+
+      if (!passVal || !alterVal) {
+        alert("⚠️ Please fill Pass Pcs. and Alter Pcs. for all rows before submitting.");
+        return;
+      }
+
       payload.push({
         "Date": date,
         "Time": time,
@@ -896,14 +910,18 @@ if (submitReportBtn) {
         "Component": row.querySelector(".component-cell select")?.value.trim() || "",
         "Balance": row.querySelector(".balance-input")?.value.trim() || "",
         "Target": row.querySelector(".target-input")?.value.trim() || "",
-        "Pass Pcs.": row.querySelector(".pass-input")?.value.trim() || "",
-        "Alter Pcs.": row.querySelector(".alter-input")?.value.trim() || "",
+        "Pass Pcs.": passVal,
+        "Alter Pcs.": alterVal,
         "Alter %": row.querySelector(".alter-percent-input")?.value.trim() || "",
         "Achieved qty.": row.querySelector(".achieved-input")?.value.trim() || ""
       });
-    });
+    }
 
     try {
+      // ✅ Disable button to prevent double clicks
+      submitReportBtn.disabled = true;
+      submitReportBtn.innerText = "Submitting...";
+
       await fetch(finalOutputUrl, {
         method: "POST",
         mode: "no-cors",
@@ -913,7 +931,7 @@ if (submitReportBtn) {
 
       console.log("✅ Report data saved to sheet");
 
-      // ✅ Show success message in UI
+      // ✅ Success message
       const msgDiv = document.createElement("div");
       msgDiv.id = "submitMsg";
       msgDiv.innerText = "✅ Data submitted successfully!";
@@ -922,22 +940,20 @@ if (submitReportBtn) {
       msgDiv.style.marginTop = "10px";
       msgDiv.style.textAlign = "center";
 
-      // Remove old message if exists
       const oldMsg = document.getElementById("submitMsg");
       if (oldMsg) oldMsg.remove();
-
-      // Append below the button
       submitReportBtn.parentNode.appendChild(msgDiv);
 
-      // ✅ Auto-hide after 3 seconds (optional)
+      // ✅ Re-enable button after success
       setTimeout(() => {
+        submitReportBtn.disabled = false;
+        submitReportBtn.innerText = "Submit Report";
         msgDiv.remove();
       }, 3000);
 
     } catch (err) {
       console.error("❌ Failed to save report data:", err);
 
-      // ✅ Show error message in UI
       const msgDiv = document.createElement("div");
       msgDiv.id = "submitMsg";
       msgDiv.innerText = "❌ Failed to submit data!";
@@ -948,11 +964,17 @@ if (submitReportBtn) {
 
       const oldMsg = document.getElementById("submitMsg");
       if (oldMsg) oldMsg.remove();
-
       submitReportBtn.parentNode.appendChild(msgDiv);
+
+      // ✅ Re-enable button after error
+      submitReportBtn.disabled = false;
+      submitReportBtn.innerText = "Submit Report";
     }
   });
 }
+
+
+
 
 
 // ✅ Line Reporting Refresh → Go to index.html
